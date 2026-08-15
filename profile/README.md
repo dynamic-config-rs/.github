@@ -1,9 +1,10 @@
 # dynamic-config
 
-**Configuration that stays live after startup.** Files, environment,
-remote stores and command-line flags merged into one typed value, re-read
-when they change, served to every thread as a single atomic load — in
-Rust, Python and Node.js, from one engine.
+**One configuration engine, the same semantics in Rust, Python and
+Node.js.** Files, environment, remote stores and command-line flags merged
+into one typed value, re-read when they change, served to every thread as
+a single atomic load — with hot reload, a last-known-good cache and
+provenance for every value, and no daemon to run.
 
 📖 **[The books](https://dynamic-config-rs.github.io/)** · one site, four
 sections
@@ -60,12 +61,29 @@ Each names the engine with a caret, so a patch release reaches it without
 a release of its own — and each is released, tested and versioned in the
 repository that owns it.
 
+## Support tiers
+
+Stability says *what a version bump may break*; a tier says *how much of
+this we carry*. Everything below is Beta — these are two different axes.
+
+| Tier | What | What it means |
+|---|---|---|
+| **1 — core** | `dynamic-config`, `dynamic-config-macros` | the compatibility promise everything else is measured against; the smallest dependency surface, and the last thing to change |
+| **2 — official ecosystem** | `dynamic-config-remote`'s eight stores, the Python wheels, the npm packages, `dynamic-config-cli` | supported, released and tested on every change to the core; their dependency surface moves with their clients (AWS SDK, etcd, PyO3, napi), so most of the churn lives here |
+| **3 — specialised** | `dynamic-config-embedded`, `dynamic-config-server` | narrower audiences, same gates, fewer callers to break; a change here is not a change to the engine |
+
 ## Stability
 
 Every crate and package is **Beta**. Pre-1.0 a breaking change bumps the
 minor version and a patch never breaks; **between here and 1.0 only
 security fixes and hotfixes land**, so pinning the minor and taking
 patches automatically is the intended way to depend on this.
+
+That is a decision, not a pause: no new stores, no new language bindings
+and no new surface until the current one has been used enough to know
+what is wrong with it. What does happen before 1.0 is evidence —
+conformance across the three languages, soak and chaos runs, fuzzing, and
+whatever real use turns up.
 
 ## Contributing
 
