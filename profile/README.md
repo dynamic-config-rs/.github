@@ -6,7 +6,7 @@ into one typed value, re-read when they change, served to every thread as
 a single atomic load — with hot reload, a last-known-good cache and
 provenance for every value, and no daemon to run.
 
-📖 **[The books](https://dynamic-config-rs.github.io/)** · one site, five
+📖 **[The books](https://dynamic-config-rs.github.io/)** · one site, seven
 sections
 
 ---
@@ -19,8 +19,9 @@ sections
 | **Python** | `pip install dynamic-config-py` | [/python/](https://dynamic-config-rs.github.io/python/) |
 | **Node.js** | `npm install dynamic-config-node` | [/node/](https://dynamic-config-rs.github.io/node/) |
 | **a Python web service** | `pip install "dynamic-config-py[fastapi]"` | [/web/](https://dynamic-config-rs.github.io/web/) |
-| **a Rust web service** | `cargo add dynamic-config-axum` | [Serving HTTP](https://dynamic-config-rs.github.io/serving-http.html) |
+| **a Rust web service** | `cargo add dynamic-config-axum` | [/rust-web/](https://dynamic-config-rs.github.io/rust-web/) |
 | **any of them, from etcd / Vault / S3 / …** | one crate, one extra, one package | [/remote/](https://dynamic-config-rs.github.io/remote/) |
+| **pods on Kubernetes** | annotate the pod; an agent appears in it | [/k8s/](https://dynamic-config-rs.github.io/k8s/) |
 
 ```rust
 #[dynamic_config]
@@ -59,7 +60,8 @@ Database::current().host;                            // one atomic load, any thr
 | [**dynamic-config-python**](https://github.com/dynamic-config-rs/dynamic-config-python) | dataclasses, Pydantic, msgspec; asyncio; free-threaded builds | [PyPI](https://pypi.org/project/dynamic-config-py/) |
 | [**dynamic-config-node**](https://github.com/dynamic-config-rs/dynamic-config-node) | Zod, Ajv or a plain function; prebuilt for five platforms | [npm](https://www.npmjs.com/package/dynamic-config-node) |
 | [**dynamic-config-python-web**](https://github.com/dynamic-config-rs/dynamic-config-python-web) | FastAPI, Litestar, Flask, Quart, Django + DRF + Ninja, Robyn, django-bolt — one behavioural contract | [PyPI](https://pypi.org/project/dynamic-config-py-web/) |
-| [**dynamic-config-web**](https://github.com/dynamic-config-rs/dynamic-config-web) | axum and Actix Web: one reading of configuration per request, however many sections a handler touches | [crates.io](https://crates.io/crates/dynamic-config-axum) |
+| [**dynamic-config-web**](https://github.com/dynamic-config-rs/dynamic-config-web) | tower, axum, Actix Web and Loco: one reading of configuration per request, however many sections a handler touches | [crates.io](https://crates.io/crates/dynamic-config-axum) |
+| [**dynamic-config-k8s**](https://github.com/dynamic-config-rs/dynamic-config-k8s) | the vault-injector shape: annotate a pod and an agent renders any store to a file inside it — webhook, agent, operator | [ghcr.io](https://github.com/orgs/dynamic-config-rs/packages) |
 
 Each names the engine with a caret, so a patch release reaches it without
 a release of its own — and each is released, tested and versioned in the
