@@ -123,3 +123,17 @@ one-shot scripts deleted (their repo-settings logic now lives in
 `protect-branches.sh`). `ROADMAP.md` in the engine repo is the plan of
 record; item 1 (CLAUDE_CODE_OAUTH_TOKEN) and the Dependabot PRs remain
 open operator actions.
+
+## setLogger delivery on macOS CI (dynamic-config-node)
+
+On GitHub's macOS runners, the moment `tests/logging.test.js` runs, the
+engine goes silent for that whole test process: no sink invocation, no
+stderr fallback, no watch-driven reload (generation never advances) —
+while the identical binary reloads and logs normally in the sibling
+test processes of the same run, and Linux delivers everywhere. Bracket
+diagnostics around the sink call printed nothing, so the stall is
+upstream of the sink. The two delivery tests skip on darwin with a
+pointer here; the sink itself gained `catch_unwind` and a loud
+non-Ok-status fallback either way. Needs a session on real mac
+hardware: reproduce `logging.test.js` alone, then bisect
+setLogger-install → manual reload → watch reload.
