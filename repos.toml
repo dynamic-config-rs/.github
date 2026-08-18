@@ -1,0 +1,57 @@
+# The one list of this organisation's repositories, and what each needs.
+#
+# Every script at this level reads it — protect-branches.sh,
+# set-secrets.sh, security-features.sh, github-metadata.sh — so a new
+# repository is added HERE, once, and every script covers it on its next
+# run. The hole this closes is recorded in OUTSTANDING.md: a repository
+# created but not added to a script's private list stayed unprotected,
+# secretless and undescribed until each script's list was found and fixed
+# by hand. dynamic-config-web and dynamic-config-python-web both paid it.
+#
+# Deliberately a constrained TOML subset — `[section]` headers and
+# `key = value` lines only — so a shell script can read it with awk and
+# nothing has to be installed.
+
+[dynamic-config]
+gates = true                # main requires "CI is green" + "Security is green"
+dev = true                  # has a dev branch promote.sh promotes
+secrets = "CLAUDE_CODE_OAUTH_TOKEN"
+environments = "crates-io"  # CARGO_REGISTRY_TOKEN lives there
+
+[dynamic-config-remote]
+gates = true
+dev = true
+secrets = "CLAUDE_CODE_OAUTH_TOKEN"
+environments = "crates-io"
+
+[dynamic-config-python]
+gates = true
+dev = true
+secrets = "CLAUDE_CODE_OAUTH_TOKEN,PYPI_TOKEN"
+
+[dynamic-config-node]
+gates = true
+dev = true
+secrets = "CLAUDE_CODE_OAUTH_TOKEN,NPM_TOKEN"
+
+[dynamic-config-web]
+gates = true
+dev = true
+secrets = "CLAUDE_CODE_OAUTH_TOKEN"
+environments = "crates-io"
+
+[dynamic-config-python-web]
+gates = true
+dev = true
+secrets = "CLAUDE_CODE_OAUTH_TOKEN,PYPI_TOKEN"
+
+[dynamic-config-k8s]
+gates = true
+dev = true
+secrets = "CLAUDE_CODE_OAUTH_TOKEN,DOCKERHUB_TOKEN"
+# ghcr pushes ride GITHUB_TOKEN; DOCKERHUB_TOKEN is the second registry.
+
+[dynamic-config-rs.github.io]
+gates = false               # no dev, no required checks; Pages deploys main
+dev = false
+pages = true

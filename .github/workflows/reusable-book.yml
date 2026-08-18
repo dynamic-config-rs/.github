@@ -1,0 +1,40 @@
+# An mdBook build, callable — the job only python-web had, owed to every
+# repository with a book.
+name: Reusable book build
+
+on:
+  workflow_call:
+    inputs:
+      book-dir:
+        description: Directory holding book.toml
+        required: false
+        type: string
+        default: book
+
+permissions:
+  contents: read
+
+jobs:
+  book:
+    name: the book builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: install mdbook (digest-verified)
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -sSL -o mdbook.tar.gz \
+            https://github.com/rust-lang/mdBook/releases/download/v0.4.52/mdbook-v0.4.52-x86_64-unknown-linux-gnu.tar.gz
+          echo "c0b903f01dd8f4edc644372ad2b80b1fdddd12552d37b6a098657cbd8eddd768  mdbook.tar.gz" | sha256sum -c -
+          tar -xzf mdbook.tar.gz -C "$HOME/.local/bin"
+      - env:
+          BOOK_DIR: ${{ inputs.book-dir }}
+        run: |
+          "$HOME/.local/bin/mdbook" build "$BOOK_DIR"
+      - name: prose register
+        run: |
+          # The banned-construction check the books are written against.
+          curl -sSL -o prose-check.py \
+            https://raw.githubusercontent.com/dynamic-config-rs/.github/main/prose-check.py
+          python3 prose-check.py "$BOOK_DIR/src"

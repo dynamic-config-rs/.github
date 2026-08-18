@@ -1,0 +1,58 @@
+# Line coverage with cargo-llvm-cov, callable. Non-gating by default:
+# the threshold ratchets per repo, and a coverage drop is a review
+# conversation before it is a red X.
+name: Reusable Rust coverage
+
+on:
+  workflow_call:
+    inputs:
+      features:
+        description: Cargo features for the covered run
+        required: false
+        type: string
+        default: ""
+      minimum:
+        description: Fail below this line-coverage percentage (0 = report only)
+        required: false
+        type: number
+        default: 0
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    name: coverage report
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # master
+        with:
+          toolchain: stable
+          components: llvm-tools-preview
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
+      - uses: taiki-e/install-action@7f4eb899022d8fe70b20c4f3de697aa85c309026 # v2
+        with:
+          tool: cargo-llvm-cov
+      - env:
+          FEATURES: ${{ inputs.features }}
+          MINIMUM: ${{ inputs.minimum }}
+        run: |
+          flags=""
+          [ -n "$FEATURES" ] && flags="--features $FEATURES"
+          # shellcheck disable=SC2086
+          cargo llvm-cov --workspace $flags --summary-only --json > coverage.json
+
+          percent=$(python3 -c "
+          import json
+          data = json.load(open('coverage.json'))
+          print(round(data['data'][0]['totals']['lines']['percent'], 1))
+          ")
+
+          echo "line coverage: ${percent}%" | tee -a "$GITHUB_STEP_SUMMARY"
+
+          awk -v p="$percent" -v m="$MINIMUM" 'BEGIN { exit !(p >= m) }' || {
+            echo "::error::coverage ${percent}% is below the ${MINIMUM}% floor"
+            exit 1
+          }

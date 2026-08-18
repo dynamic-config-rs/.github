@@ -1,0 +1,80 @@
+# The Rust repositories' Security workflow, callable: cargo-deny, the
+# no-unsafe grep, and dependency review — the 75%-identical file the six
+# repos each carried, defined once.
+#
+# A caller passes its crate roster for the unsafe check and keeps its own
+# `security-ok` gate, so branch protection's check name stays local:
+#
+#   jobs:
+#     shared:
+#       uses: dynamic-config-rs/.github/.github/workflows/reusable-security-rust.yml@v1
+#       with:
+#         crates: "dynamic-config-web-core dynamic-config-tower"
+name: Reusable Rust security
+
+on:
+  workflow_call:
+    inputs:
+      crates:
+        description: Space-separated crate directories for the unsafe check
+        required: true
+        type: string
+      deny-manifest:
+        description: Path to deny.toml's directory
+        required: false
+        type: string
+        default: "."
+
+permissions:
+  contents: read
+
+jobs:
+  deny:
+    name: advisories, licences, sources
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25 # v2
+        with:
+          manifest-path: ${{ inputs.deny-manifest }}/Cargo.toml
+
+  unsafe:
+    name: no unsafe code
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - env:
+          CRATES: ${{ inputs.crates }}
+        run: |
+          for crate in $CRATES; do
+            if ! grep -q '#!\[forbid(unsafe_code)\]' "$crate/src/lib.rs"; then
+              echo "::error file=$crate/src/lib.rs::missing #![forbid(unsafe_code)]"
+              exit 1
+            fi
+          done
+
+          stray=$(grep -rn 'unsafe' --include='*.rs' \
+              ./*/tests ./*/examples 2>/dev/null \
+            | grep -v 'unsafe_code' || true)
+
+          if [ -n "$stray" ]; then
+            echo "::error::unsafe outside the crates that forbid it: $stray"
+            exit 1
+          fi
+
+  supply-chain:
+    name: dependency review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5
+        with:
+          fail-on-severity: low
+          comment-summary-in-pr: on-failure

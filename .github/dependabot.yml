@@ -1,0 +1,12 @@
+version: 2
+
+updates:
+  # The reusable workflows pin actions by SHA like every repository that
+  # calls them; the pins move here first, then roll out by tag.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]
