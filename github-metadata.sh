@@ -91,6 +91,13 @@ echo "   description and website set"
 echo
 echo "── coverage against repos.toml"
 . "$(dirname "$0")/repos.lib.sh"
+describe dynamic-config-k8s "${SITE}/k8s/" \
+  "Kubernetes-native dynamic configuration, the agent-injector shape: annotate a pod and an agent renders Consul, Vault, git, Redis, Firestore or the config server to a file inside it — templating, restricted-PSS posture, cert-manager optional."
+topics dynamic-config-k8s \
+  kubernetes helm helm-chart kustomize mutating-webhook admission-webhook \
+  sidecar-injector configuration configuration-management hot-reload \
+  vault consul secrets-management kubernetes-operator crd rust
+
 for repo in $(repos); do
   if ! grep -q "describe ${repo} \|describe \"\${ORG}.github.io\"" "$0" 2>/dev/null; then
     case "${repo}" in
@@ -102,7 +109,8 @@ done
 
 echo
 echo "── what is set now"
-for repo in dynamic-config dynamic-config-remote dynamic-config-python dynamic-config-node "${ORG}.github.io"; do
+for repo in dynamic-config dynamic-config-remote dynamic-config-python dynamic-config-node dynamic-config-k8s "${ORG}.github.io"; do
   gh api "repos/${ORG}/${repo}" \
     -q '"   \(.name): \(.topics | length) topics, homepage \(.homepage // "—")"'
 done
+

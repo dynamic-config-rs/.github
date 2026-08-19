@@ -12,7 +12,11 @@ fixes and hotfixes land. Nothing below adds surface. Everything below adds
 
 ---
 
-## 1. A semantic conformance suite — the one that matters
+## 1. A semantic conformance suite — the one that matters — ✅ LANDED
+
+*(the stabilisation round: `conformance/` in the engine repo, 20 cases,
+three runners at zero disagreement — the alias-direction disagreement it
+found on day one became a fix and a regression case)*
 
 One set of fixtures, three implementations, one expected answer.
 
@@ -73,7 +77,10 @@ absent, and why*, so a reader porting between them stops guessing.
 Cheap (an afternoon), and it doubles as the specification the conformance
 suite tests against.
 
-## 3. Long-running evidence
+## 3. Long-running evidence — ✅ LANDED
+
+*(the stabilisation round: the soak rig, 5h nightly, leak budgets in
+three languages, fuzz corpus at 1M+ per target)*
 
 - **Soak**: a watcher reloading every second for 24 hours, memory and file
   descriptors flat. `just shuttle-soak` covers the model; this covers the
@@ -96,7 +103,10 @@ Each is a workflow and a schedule, not new code.
 - **SLSA provenance** for the wheels, matching what npm already gets from
   `--provenance`.
 
-## 5. Benchmarks somebody else can reproduce
+## 5. Benchmarks somebody else can reproduce — ✅ LANDED
+
+*(the stabilisation round: `benches/matrix.rs`, `benches-rivals/`, the
+performance-budget page)*
 
 The engine's numbers (85 instructions, zero allocations) are measured and
 committed. What is missing is the *comparison* a reader actually wants:

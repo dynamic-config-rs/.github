@@ -46,3 +46,5 @@ matrix):
 Red means a vendored copy moved without this repository agreeing. Two
 scripts are per-repo by design and outside the set: `promotion-title.sh`
 and (in the pure-Python repository) `security-status.sh`.
+
+What you may build on and find unchanged tomorrow is written down: the [Compatibility Contract](https://dynamic-config-rs.github.io/compatibility.html).

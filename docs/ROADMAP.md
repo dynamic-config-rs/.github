@@ -26,7 +26,7 @@ case that would have caught it), the Node hook-delivery contract proven,
 the missing tests everywhere, the stale prose corrected, the release
 toil scripted (`repos.toml`, node's `release.sh`).
 
-### M2 — the 0.7 train · ✅ built, ships as one train
+### M2 — the 0.7 train · ✅ SHIPPED 2026-08-18 (engine 0.7.0, stores 0.7.0, py 0.3.0, node 0.0.4)
 Engine 0.7.0: the logging seam (sink, level, `log` feature — stderr
 byte-identical by default), `Format` `#[non_exhaustive]` + `Ini` +
 `Properties` (no new dependency, 1.71 floor held), the first migration
@@ -35,19 +35,19 @@ guide. Python: the `logging` bridge on by default,
 once, floors moved to 0.7, the `[patch.crates-io]` guards lifted as a
 release step.
 
-### M3 — integration round · ✅ built
+### M3 — integration round · ✅ SHIPPED 2026-08-18 (web 0.2.0 with tower, py-web 0.2.0)
 python-web's route table (six adapters, one definition; conventions
 preserved), `dynamic-config-tower` (the layer for tonic/hyper/any tower
 stack), the long-lived-connection story told on both sides, the node
 store module split, the `_config.py` no-split decision recorded.
 
-### M4 — docs round · ✅ built
+### M4 — docs round · ✅ SHIPPED 2026-08-18 (seven books live, /rust-web/ and /k8s/ included)
 Quickstarts in every book; the 477-line intro and the 991-line stores
 page split; the config server un-gated; the `/rust-web/` book (eleven
 pages, production-surface recipes); the parity table; `prose-check`
 clean at zero across six books.
 
-### M5 — devops round · ✅ built, roll-out follows the .github push
+### M5 — devops round · ✅ SHIPPED 2026-08-18 (.github live; reusable-workflow caller migration is the follow-up)
 The `.github` repository assembled: the registry (`repos.toml`) behind
 every operator script, repo settings joined branch protection, the
 scripts-drift checker (already caught the one real drift), three

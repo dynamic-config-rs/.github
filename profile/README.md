@@ -61,7 +61,7 @@ Database::current().host;                            // one atomic load, any thr
 | [**dynamic-config-node**](https://github.com/dynamic-config-rs/dynamic-config-node) | Zod, Ajv or a plain function; prebuilt for five platforms | [npm](https://www.npmjs.com/package/dynamic-config-node) |
 | [**dynamic-config-python-web**](https://github.com/dynamic-config-rs/dynamic-config-python-web) | FastAPI, Litestar, Flask, Quart, Django + DRF + Ninja, Robyn, django-bolt — one behavioural contract | [PyPI](https://pypi.org/project/dynamic-config-py-web/) |
 | [**dynamic-config-web**](https://github.com/dynamic-config-rs/dynamic-config-web) | tower, axum, Actix Web and Loco: one reading of configuration per request, however many sections a handler touches | [crates.io](https://crates.io/crates/dynamic-config-axum) |
-| [**dynamic-config-k8s**](https://github.com/dynamic-config-rs/dynamic-config-k8s) | the vault-injector shape: annotate a pod and an agent renders any store to a file inside it — webhook, agent, operator | [ghcr.io](https://github.com/orgs/dynamic-config-rs/packages) |
+| [**dynamic-config-k8s**](https://github.com/dynamic-config-rs/dynamic-config-k8s) | the agent-injector shape: annotate a pod and an agent renders any store to a file inside it — webhook, agent, operator | [ghcr.io](https://github.com/orgs/dynamic-config-rs/packages) |
 
 Each names the engine with a caret, so a patch release reaches it without
 a release of its own — and each is released, tested and versioned in the

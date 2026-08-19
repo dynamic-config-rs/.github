@@ -1,30 +1,73 @@
 # Outstanding
 
-State as of 2026-08-18, after the release round that shipped
-`dynamic-config-web` 0.1.0, `dynamic-config-py` 0.2.0,
-`dynamic-config-py-web` 0.1.0 and `dynamic-config-node` 0.0.3.
-
-Nothing here blocks anything. Each item is a thing that is true and should
-not stay true.
+State as of 2026-08-19, after the stabilisation round (the one that
+zeroes CREDIBILITY-BACKLOG.md and the k8s ROADMAP): everything below is
+either a queued user action or a thing that is true and should not stay
+true. Nothing blocks anything.
 
 ## Where everything stands
 
-| registry | package | version |
-|---|---|---|
-| crates.io | `dynamic-config`, `-macros`, `-cli`, `-embedded` | 0.6.3 |
-| crates.io | the ten store crates, `-store-core` … `-server` | 0.6.2 |
-| crates.io | `-web-core`, `-axum`, `-actix`, `-loco` | 0.1.0 |
-| PyPI | `dynamic-config-py`, `dynamic-config-py-remote` | 0.2.0 |
-| PyPI | `dynamic-config-py-web` | 0.1.0 |
-| npm | `dynamic-config-node`, `dynamic-config-node-remote` | 0.0.3 |
+| registry | package | published | next (this round, unreleased) |
+|---|---|---|---|
+| crates.io | `dynamic-config`, `-macros`, `-cli`, `-embedded` | 0.7.0 | 0.7.1 |
+| crates.io | the ten store crates, `-store-core` … `-server` | 0.7.0 | patch wave |
+| crates.io | `-web-core`, `-tower`, `-axum`, `-actix`, `-loco` | 0.2.0 | 0.2.x |
+| PyPI | `dynamic-config-py`, `dynamic-config-py-remote` | 0.3.0 | 0.3.x |
+| PyPI | `dynamic-config-py-web` | 0.2.0 | 0.2.x |
+| npm | `dynamic-config-node`, `dynamic-config-node-remote` | 0.0.4 | 0.0.5 |
+| ghcr + Docker Hub | the three k8s images + chart | 0.1.0 | 0.1.1 → 0.2.0 → 0.3.0 |
 
-All six repositories: working tree clean, `dev` level with `main`, CI and
-Security green on `main`, `main` protected with `CI is green` +
-`Security is green`, strict, admins included, linear history, no force
-pushes or deletions.
+The docs site publishes seven books — `/`, `/remote/`, `/python/`,
+`/node/`, `/web/` (Python web), `/rust-web/`, `/k8s/`.
 
-The docs site publishes five books — `/`, `/web/`, `/remote/`, `/python/`,
-`/node/`.
+## 0 — Queued user actions, post-train
+
+In release-train order; none can be done by a working tree:
+
+1. **PyPI + npm trusted publishing — the workflows are ALREADY
+   token-free**, so these console entries must exist BEFORE the next
+   python/node release or the publish step fails:
+   - **PyPI** → each project → Settings → Publishing → *Add a trusted
+     publisher* (GitHub): owner `dynamic-config-rs`, repository
+     `dynamic-config-python`, workflow `release.yml`, environment blank —
+     for **`dynamic-config-py`** and **`dynamic-config-py-remote`** —
+     and the same entry on **`dynamic-config-py-web`** (repository
+     `dynamic-config-python-web`, workflow `release.yml`).
+     Afterwards both repos' `PYPI_TOKEN` secrets can be revoked.
+   - **npm** → each package → Settings → *Trusted publisher* (GitHub
+     Actions): repository `dynamic-config-rs/dynamic-config-node`,
+     workflow `release.yml` — for the full roster:
+     `dynamic-config-node`, `dynamic-config-node-remote`, and the ten
+     platform packages `dynamic-config-node{,-remote}-linux-x64-glibc`,
+     `…-linux-arm64-glibc`, `…-darwin-x64`, `…-darwin-arm64`,
+     `…-win32-x64`. Afterwards `NPM_TOKEN` can be revoked and deleted.
+   `--provenance` stays on for npm; PyPI attests through the same OIDC.
+   SLSA beyond this is optional polish, no longer a queue item.
+2. **Tag `.github` as `v1`** once its reusable workflows merge —
+   `dynamic-config-remote/security.yml` (the migration pilot) points at
+   `@main` and says exactly where to flip it.
+3. **ArtifactHub claim** after k8s 0.1.1's first release lands the
+   chart and metadata on ghcr (`deploy/helm/artifacthub-repo.yml`
+   documents the claim; paste the repositoryID it assigns).
+4. **Dependabot's `time` ignore** can come off wherever it was set: the
+   1.88 floor took the real fix.
+5. **The dev-only `[patch.crates-io]` blocks** in the python and node
+   workspaces come OUT — and their engine floors go to `"0.7.1"` — in
+   the same commit that releases each binding, after engine 0.7.1 is on
+   crates.io. Both blocks say so in place; `cargo package` refuses
+   patched sources, so forgetting is loud.
+
+## 0b — The macOS setLogger silence, now with its un-skip gate
+
+The two Node delivery tests skip on darwin (the engine goes silent for
+a whole test process on macOS CI while Linux delivers everywhere; the
+skip is loud and points here). The investigation's next move now runs
+without a human: the node repository's **nightly `maclogger` leg** runs
+those tests on a hosted `macos-14` runner with the skip lifted
+(`DYNAMIC_CONFIG_MAC_LOGGER_GATE=1`). Reproduces → real on hosted
+hardware, investigate there; passes → the silence narrows to the local
+runner's FSEvents, and that fact gets recorded here. Either result
+moves it; the skip alone never did.
 
 ## 1 — `CLAUDE_CODE_OAUTH_TOKEN` is missing on the two new repositories
 
@@ -107,33 +150,3 @@ request title become `main`'s commit subject, which is the whole reason
   by every pull request this round, but nobody has watched a docs-only pull
   request skip the expensive jobs while `CI is green` still reports success.
   One such pull request would settle it.
-
-
----
-
-## Update — the perfection round (0.7 work, in progress on disk)
-
-Everything above the line was the state after the release day. Since
-then, on this disk and uncommitted: the 0.7 train (logging bridge +
-ini/properties + `Format` non_exhaustive), the scope-tear fix and
-conformance case 13, the route-table dedup, `dynamic-config-tower`, the
-`/rust-web/` book, quickstarts and the two wall splits, this repository
-(`.github`) assembled, node's msrv/docs CI jobs, coverage jobs, and the
-one-shot scripts deleted (their repo-settings logic now lives in
-`protect-branches.sh`). `ROADMAP.md` in the engine repo is the plan of
-record; item 1 (CLAUDE_CODE_OAUTH_TOKEN) and the Dependabot PRs remain
-open operator actions.
-
-## setLogger delivery on macOS CI (dynamic-config-node)
-
-On GitHub's macOS runners, the moment `tests/logging.test.js` runs, the
-engine goes silent for that whole test process: no sink invocation, no
-stderr fallback, no watch-driven reload (generation never advances) —
-while the identical binary reloads and logs normally in the sibling
-test processes of the same run, and Linux delivers everywhere. Bracket
-diagnostics around the sink call printed nothing, so the stall is
-upstream of the sink. The two delivery tests skip on darwin with a
-pointer here; the sink itself gained `catch_unwind` and a loud
-non-Ok-status fallback either way. Needs a session on real mac
-hardware: reproduce `logging.test.js` alone, then bisect
-setLogger-install → manual reload → watch reload.

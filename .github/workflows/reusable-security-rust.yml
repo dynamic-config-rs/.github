@@ -19,6 +19,14 @@ on:
         description: Space-separated crate directories for the unsafe check
         required: true
         type: string
+      bins:
+        description: >-
+          Space-separated crate directories whose root is src/main.rs — a
+          binary's forbid lives there, and a loop that only reads lib.rs
+          would grant it a silent exemption.
+        required: false
+        type: string
+        default: 
       deny-manifest:
         description: Path to deny.toml's directory
         required: false
@@ -47,6 +55,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - env:
           CRATES: ${{ inputs.crates }}
+          BINS: ${{ inputs.bins }}
         run: |
           for crate in $CRATES; do
             if ! grep -q '#!\[forbid(unsafe_code)\]' "$crate/src/lib.rs"; then
@@ -55,9 +64,19 @@ jobs:
             fi
           done
 
+          for crate in $BINS; do
+            if ! grep -q '#!\[forbid(unsafe_code)\]' "$crate/src/main.rs"; then
+              echo "::error file=$crate/src/main.rs::missing #![forbid(unsafe_code)]"
+              exit 1
+            fi
+          done
+
+          # Tests and examples are separate crates the lib's forbid does
+          # not reach. Comment lines and the attribute's own spelling are
+          # the only tolerated appearances.
           stray=$(grep -rn 'unsafe' --include='*.rs' \
               ./*/tests ./*/examples 2>/dev/null \
-            | grep -v 'unsafe_code' || true)
+            | grep -v 'unsafe_code' | grep -v '// ' || true)
 
           if [ -n "$stray" ]; then
             echo "::error::unsafe outside the crates that forbid it: $stray"

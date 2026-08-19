@@ -30,6 +30,51 @@ to back. And the docs site must go last, because `site.yml` checks out
 `dynamic-config-python-web`; pushing it before that repository existed would
 have broken the six-hourly build.
 
+## The stabilisation-round train (2026-08, this round)
+
+The order for THIS round's tail, superseding the generic order above
+for one pass. Ship as patches; the two called-out exceptions (MSRV
+1.88, secrets containment default) are security work named in every
+changelog.
+
+```
+0. dynamic-config-k8s 0.1.1     T1 only: release.yml itself ships the
+                                images+chart; no engine coupling.
+                                FIRST because it proves the machinery
+                                the later k8s rungs ride.
+1. dynamic-config 0.7.1         wake channel, containment, MSRV,
+                                serde-scrub fix, conformance, soak
+2. dynamic-config-remote        patch wave ×10 on engine 0.7.1
+   ── BEFORE 3: the PyPI + npm Trusted Publisher console entries
+   (OUTSTANDING.md §0 item 1) — the release workflows are token-free
+   and FAIL without them.
+3. dynamic-config-python 0.3.1  native failure events (the round's
+                                patch-even-where-minor rule; the
+                                deprecation is additive); BEFORE
+                                publishing:
+                                delete the [patch.crates-io] block and
+                                raise the engine floor to "0.7.1" —
+                                the block says so in place
+   dynamic-config-node 0.0.5    same patch-block rule
+4. dynamic-config-web 0.2.x     tower/core examples, cookbook
+5. dynamic-config-python-web 0.2.x  stream_events native; needs py 0.4
+6. dynamic-config-k8s 0.2.0     async stores (chart 0.2.0, images)
+7. dynamic-config-k8s 0.3.0     selfRotate + operator, AFTER one
+                                nightly rotation-soak has run green
+8. dynamic-config-rs.github.io  last, as always
+```
+
+Before each release PR: regenerate the lockfile, then batch-scan it —
+this round's advisory-season lesson:
+
+```sh
+cargo generate-lockfile   # (or the repo's just msrv, which restores pins)
+osv-scanner scan --lockfile Cargo.lock
+```
+
+After the train, the queued console actions live in `OUTSTANDING.md` §0:
+trusted publishing, the `.github` `v1` tag, the ArtifactHub claim.
+
 ## Cutting a release, per repository
 
 **Rust workspaces** — `dynamic-config`, `dynamic-config-remote`,
