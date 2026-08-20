@@ -46,6 +46,18 @@ jobs:
       - uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25 # v2
         with:
           manifest-path: ${{ inputs.deny-manifest }}/Cargo.toml
+          # An exception that no longer matches anything is a decision
+          # about a dependency that has left, still carried as though it
+          # were current — and the reason written beside it is then
+          # documentation of something untrue. Nothing else makes that
+          # drift visible without somebody going and looking, so it fails
+          # the job.
+          arguments: --all-features
+          # After the subcommand, not before it: the action puts
+          # `arguments` ahead of `check`, where a lint level is not a
+          # flag cargo-deny takes — it exits on the usage message
+          # rather than on anything it found.
+          command-arguments: -D advisory-not-detected
 
   unsafe:
     name: no unsafe code

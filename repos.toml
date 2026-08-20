@@ -51,6 +51,13 @@ dev = true
 secrets = "CLAUDE_CODE_OAUTH_TOKEN,DOCKERHUB_TOKEN"
 # ghcr pushes ride GITHUB_TOKEN; DOCKERHUB_TOKEN is the second registry.
 
+[.github]
+# The organisation profile and the shared reusable workflows. No CI gates
+# and nothing to publish — but a repository all the same, and one whose
+# workflows every other repository runs, so it wants the same secret
+# scanning as the code.
+gates = false
+
 [dynamic-config-rs.github.io]
 gates = false               # no dev, no required checks; Pages deploys main
 dev = false
